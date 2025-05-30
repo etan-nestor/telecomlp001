@@ -1,0 +1,217 @@
+'use client'
+
+import { motion, AnimatePresence } from 'framer-motion'
+import { Phone, ShoppingCart, Wrench, ChevronDown, Menu, X } from 'lucide-react'
+import Link from 'next/link'
+import { useState, useEffect } from 'react'
+import { usePathname } from 'next/navigation'
+
+const navLinks = [
+  { name: 'Accueil', href: '/' },
+  { 
+    name: 'Services', 
+    href: '/services',
+    subLinks: [
+      { name: 'Vente de Téléphones', href: '/services/vente' },
+      { name: 'Réparation', href: '/services/reparation' },
+      { name: 'Accessoires', href: '/services/accessoires' },
+    ]
+  },
+  { name: 'Marques', href: '/marques' },
+  { name: 'À Propos', href: '/about' },
+  { name: 'Contact', href: '/contact' },
+]
+
+export default function Navbar() {
+  const [isOpen, setIsOpen] = useState(false)
+  const [hoveredLink, setHoveredLink] = useState<number | null>(null)
+  const pathname = usePathname()
+  const [scrolled, setScrolled] = useState(false)
+
+  useEffect(() => {
+    const handleScroll = () => {
+      setScrolled(window.scrollY > 10)
+    }
+    window.addEventListener('scroll', handleScroll)
+    return () => window.removeEventListener('scroll', handleScroll)
+  }, [])
+
+  return (
+    <motion.nav 
+      initial={{ y: -100 }}
+      animate={{ y: 0 }}
+      transition={{ duration: 0.5 }}
+      className={`fixed w-full z-50 ${scrolled ? 'bg-gray-900/90 backdrop-blur-md border-b border-gray-800' : 'bg-transparent'}`}
+    >
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="flex items-center justify-between h-20">
+          {/* Logo */}
+          <Link href="/" className="flex items-center space-x-2">
+            <motion.div 
+              whileHover={{ scale: 1.1 }}
+              className="flex items-center justify-center w-10 h-10 rounded-full bg-gradient-to-br from-orange-500 to-red-600"
+            >
+              <Phone className="w-5 h-5 text-white" />
+            </motion.div>
+            <motion.span 
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ delay: 0.2 }}
+              className="text-xl font-bold bg-gradient-to-r from-orange-400 to-red-500 bg-clip-text text-transparent"
+            >
+              Nestor Telecom
+            </motion.span>
+          </Link>
+
+          {/* Desktop Navigation */}
+          <div className="hidden md:flex items-center space-x-8">
+            {navLinks.map((link, index) => (
+              <div 
+                key={index}
+                className="relative"
+                onMouseEnter={() => setHoveredLink(index)}
+                onMouseLeave={() => setHoveredLink(null)}
+              >
+                <Link 
+                  href={link.href}
+                  className={`flex items-center px-1 py-2 text-sm font-medium transition-colors ${
+                    pathname === link.href 
+                      ? 'text-orange-400' 
+                      : 'text-gray-300 hover:text-orange-400'
+                  }`}
+                >
+                  {link.name}
+                  {link.subLinks && <ChevronDown className="ml-1 w-4 h-4" />}
+                </Link>
+
+                {/* Active indicator */}
+                {pathname === link.href && (
+                  <motion.div 
+                    layoutId="activeIndicator"
+                    className="absolute bottom-0 left-0 right-0 h-0.5 bg-orange-500 rounded-full"
+                    transition={{ type: 'spring', bounce: 0.2, duration: 0.6 }}
+                  />
+                )}
+
+                {/* Dropdown */}
+                {link.subLinks && hoveredLink === index && (
+                  <AnimatePresence>
+                    <motion.div
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: 10 }}
+                      transition={{ duration: 0.2 }}
+                      className="absolute left-0 top-full mt-2 w-48 rounded-md shadow-lg bg-gray-800 border border-gray-700 z-50"
+                    >
+                      <div className="py-1">
+                        {link.subLinks.map((subLink, subIndex) => (
+                          <Link
+                            key={subIndex}
+                            href={subLink.href}
+                            className={`block px-4 py-2 text-sm ${
+                              pathname === subLink.href
+                                ? 'bg-gray-700 text-orange-400'
+                                : 'text-gray-300 hover:bg-gray-700 hover:text-orange-400'
+                            }`}
+                          >
+                            {subLink.name}
+                          </Link>
+                        ))}
+                      </div>
+                    </motion.div>
+                  </AnimatePresence>
+                )}
+              </div>
+            ))}
+
+            <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+              <Link 
+                href="/contact" 
+                className="px-4 py-2 rounded-md bg-gradient-to-r from-orange-500 to-red-600 text-white text-sm font-medium shadow-lg hover:from-orange-600 hover:to-red-700 transition-all"
+              >
+                Demander un devis
+              </Link>
+            </motion.div>
+          </div>
+
+          {/* Mobile menu button */}
+          <div className="md:hidden flex items-center">
+            <motion.button
+              whileHover={{ scale: 1.1 }}
+              whileTap={{ scale: 0.9 }}
+              onClick={() => setIsOpen(!isOpen)}
+              className="inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-white hover:bg-gray-700 focus:outline-none"
+              aria-expanded="false"
+            >
+              {isOpen ? (
+                <X className="h-6 w-6" />
+              ) : (
+                <Menu className="h-6 w-6" />
+              )}
+            </motion.button>
+          </div>
+        </div>
+      </div>
+
+      {/* Mobile menu */}
+      <AnimatePresence>
+        {isOpen && (
+          <motion.div
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: 'auto' }}
+            exit={{ opacity: 0, height: 0 }}
+            transition={{ duration: 0.3 }}
+            className="md:hidden bg-gray-900 border-t border-gray-800"
+          >
+            <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3">
+              {navLinks.map((link, index) => (
+                <div key={index}>
+                  <Link
+                    href={link.href}
+                    className={`block px-3 py-2 rounded-md text-base font-medium ${
+                      pathname === link.href
+                        ? 'bg-gray-800 text-orange-400'
+                        : 'text-gray-300 hover:bg-gray-800 hover:text-white'
+                    }`}
+                    onClick={() => setIsOpen(false)}
+                  >
+                    {link.name}
+                  </Link>
+
+                  {link.subLinks && (
+                    <div className="pl-4 mt-1 space-y-1">
+                      {link.subLinks.map((subLink, subIndex) => (
+                        <Link
+                          key={subIndex}
+                          href={subLink.href}
+                          className={`block px-3 py-2 rounded-md text-sm font-medium ${
+                            pathname === subLink.href
+                              ? 'bg-gray-700 text-orange-400'
+                              : 'text-gray-400 hover:bg-gray-700 hover:text-white'
+                          }`}
+                          onClick={() => setIsOpen(false)}
+                        >
+                          {subLink.name}
+                        </Link>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
+            <div className="px-4 py-3 border-t border-gray-800">
+              <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
+                <Link
+                  href="/contact"
+                  className="w-full flex items-center justify-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-gradient-to-r from-orange-500 to-red-600 hover:from-orange-600 hover:to-red-700"
+                >
+                  Demander un devis
+                </Link>
+              </motion.div>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </motion.nav>
+  )
+}
