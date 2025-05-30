@@ -37,6 +37,7 @@ export default function Navbar() {
     return () => window.removeEventListener('scroll', handleScroll)
   }, [])
 
+  // Fermer le dropdown si on clique à l'extérieur
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
@@ -57,55 +58,29 @@ export default function Navbar() {
       transition={{ duration: 0.5 }}
       className={`fixed w-full z-50 ${scrolled ? 'bg-gray-900/90 backdrop-blur-md border-b border-gray-800' : 'bg-transparent'}`}
     >
-      <div className="max-w-7xl mx-auto px-3 sm:px-4">
-        <div className="flex items-center justify-between h-14 md:h-20">
-          {/* Logo - Version mobile (icône seule) */}
-          <Link href="/" className="flex-shrink-0">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="flex items-center justify-between h-16 md:h-20">
+          {/* Logo - Version mobile (icône seule) et desktop (icône + texte) */}
+          <Link href="/" className="flex items-center space-x-2">
             <motion.div 
               whileHover={{ scale: 1.1 }}
               whileTap={{ scale: 0.95 }}
-              className="flex items-center justify-center w-9 h-9 md:w-10 md:h-10 rounded-full bg-gradient-to-br from-orange-500 to-red-600"
+              className="flex items-center justify-center w-10 h-10 rounded-full bg-gradient-to-br from-orange-500 to-red-600"
             >
-              <Phone className="w-4 h-4 md:w-5 md:h-5 text-white" />
+              <Phone className="w-5 h-5 text-white" />
             </motion.div>
+            <motion.span 
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ delay: 0.2 }}
+              className="hidden md:block text-xl font-bold bg-gradient-to-r from-orange-400 to-red-500 bg-clip-text text-transparent"
+            >
+              Nestor Telecom
+            </motion.span>
           </Link>
 
-          {/* Nom de l'entreprise - visible uniquement sur desktop */}
-          <motion.span 
-            className="hidden md:block text-xl font-bold bg-gradient-to-r from-orange-400 to-red-500 bg-clip-text text-transparent ml-2"
-          >
-            Nestor Telecom
-          </motion.span>
-
-          {/* Bouton Devis mobile - positionné au centre */}
-          <motion.div 
-            whileTap={{ scale: 0.95 }}
-            className="md:hidden mx-auto"
-          >
-            <Link 
-              href="/contact" 
-              className="px-3 py-1.5 text-xs rounded-md bg-gradient-to-r from-orange-500 to-red-600 text-white font-medium shadow-lg"
-            >
-              Devis
-            </Link>
-          </motion.div>
-
-          {/* Menu hamburger - positionné à gauche */}
-          <motion.button
-            whileTap={{ scale: 0.9 }}
-            onClick={() => setIsOpen(!isOpen)}
-            className="md:hidden p-2 rounded-md text-gray-400 hover:text-white hover:bg-gray-700 focus:outline-none ml-auto"
-            aria-label="Menu"
-          >
-            {isOpen ? (
-              <X className="h-5 w-5" />
-            ) : (
-              <Menu className="h-5 w-5" />
-            )}
-          </motion.button>
-
-          {/* Navigation desktop */}
-          <div className="hidden md:flex items-center space-x-6 lg:space-x-8 ml-8">
+          {/* Desktop Navigation */}
+          <div className="hidden md:flex items-center space-x-6 lg:space-x-8">
             {navLinks.map((link, index) => (
               <div 
                 key={index}
@@ -130,6 +105,7 @@ export default function Navbar() {
                   )}
                 </Link>
 
+                {/* Active indicator */}
                 {pathname === link.href && (
                   <motion.div 
                     layoutId="activeIndicator"
@@ -138,6 +114,7 @@ export default function Navbar() {
                   />
                 )}
 
+                {/* Dropdown */}
                 {link.subLinks && hoveredLink === index && (
                   <AnimatePresence>
                     <motion.div
@@ -182,10 +159,39 @@ export default function Navbar() {
               </Link>
             </motion.div>
           </div>
+
+          {/* Mobile menu button */}
+          <div className="md:hidden flex items-center space-x-3">
+            <motion.div 
+              whileHover={{ scale: 1.1 }}
+              whileTap={{ scale: 0.9 }}
+            >
+              <Link 
+                href="/contact" 
+                className="px-3 py-1.5 text-xs rounded-md bg-gradient-to-r from-orange-500 to-red-600 text-white font-medium shadow-lg hover:from-orange-600 hover:to-red-700 transition-all"
+              >
+                Devis
+              </Link>
+            </motion.div>
+            
+            <motion.button
+              whileHover={{ scale: 1.1 }}
+              whileTap={{ scale: 0.9 }}
+              onClick={() => setIsOpen(!isOpen)}
+              className="inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-white hover:bg-gray-700 focus:outline-none"
+              aria-expanded="false"
+            >
+              {isOpen ? (
+                <X className="h-6 w-6" />
+              ) : (
+                <Menu className="h-6 w-6" />
+              )}
+            </motion.button>
+          </div>
         </div>
       </div>
 
-      {/* Menu mobile */}
+      {/* Mobile menu */}
       <AnimatePresence>
         {isOpen && (
           <motion.div
@@ -195,7 +201,7 @@ export default function Navbar() {
             transition={{ duration: 0.3, ease: "easeInOut" }}
             className="md:hidden bg-gray-900/95 backdrop-blur-sm border-t border-gray-800 overflow-hidden"
           >
-            <div className="px-2 pt-2 pb-3 space-y-1">
+            <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3">
               {navLinks.map((link, index) => (
                 <div key={index} className="overflow-hidden">
                   <motion.div
