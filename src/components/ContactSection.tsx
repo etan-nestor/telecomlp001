@@ -37,7 +37,7 @@ export default function ContactSection() {
                 </div>
                 <div>
                   <h4 className="text-lg font-medium text-white">Téléphone</h4>
-                  <p className="text-gray-400">+33 1 23 45 67 89</p>
+                  <p className="text-gray-400">+226 65 03 37 42</p>
                   <p className="text-sm text-gray-500 mt-1">Lun-Sam: 9h-19h</p>
                 </div>
               </div>
@@ -59,7 +59,7 @@ export default function ContactSection() {
                 </div>
                 <div>
                   <h4 className="text-lg font-medium text-white">Adresse</h4>
-                  <p className="text-gray-400">123 Rue des Téléphones, 75000 Paris</p>
+                  <p className="text-gray-400">BP Rue des Téléphones,ZABRE-DAAGA</p>
                   <p className="text-sm text-gray-500 mt-1">Métro: République</p>
                 </div>
               </div>

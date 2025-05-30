@@ -8,29 +8,29 @@ const footerLinks = [
   {
     title: 'Services',
     links: [
-      { name: 'Vente de téléphones', href: '/services/vente' },
-      { name: 'Réparation smartphone', href: '/services/reparation' },
-      { name: 'Accessoires', href: '/services/accessoires' },
-      { name: 'Diagnostic gratuit', href: '/services/diagnostic' },
+      { name: 'Vente de téléphones', href: '#' },
+      { name: 'Réparation smartphone', href: '#' },
+      { name: 'Accessoires', href: '#' },
+      { name: 'Diagnostic gratuit', href: '#' },
     ],
   },
   {
     title: 'Marques',
     links: [
-      { name: 'iPhone', href: '/marques/iphone' },
-      { name: 'Samsung', href: '/marques/samsung' },
-      { name: 'Techno', href: '/marques/techno' },
-      { name: 'Nokia', href: '/marques/nokia' },
-      { name: 'Toutes les marques', href: '/marques' },
+      { name: 'iPhone', href: '#' },
+      { name: 'Samsung', href: '#' },
+      { name: 'Techno', href: '#' },
+      { name: 'Nokia', href: '#' },
+      { name: 'Toutes les marques', href: '#' },
     ],
   },
   {
     title: 'Entreprise',
     links: [
-      { name: 'À propos', href: '/about' },
-      { name: 'Notre équipe', href: '/team' },
-      { name: 'Blog', href: '/blog' },
-      { name: 'Carrières', href: '/careers' },
+      { name: 'À propos', href: '#' },
+      { name: 'Notre équipe', href: '#' },
+      { name: 'Blog', href: '#' },
+      { name: 'Carrières', href: '#' },
     ],
   },
 ]

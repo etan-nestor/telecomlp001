@@ -122,7 +122,7 @@ export default function Navbar() {
                       animate={{ opacity: 1, y: 0 }}
                       exit={{ opacity: 0, y: 10 }}
                       transition={{ duration: 0.2, ease: "easeOut" }}
-                      className="absolute left-0 top-full mt-1 w-56 rounded-md shadow-lg bg-gray-800 border border-gray-700 z-50 overflow-hidden"
+                      className="absolute left-0 top-full mt-0 w-56 rounded-md shadow-lg bg-gray-800 border border-gray-700 z-50 overflow-hidden"
                     >
                       <div className="py-1">
                         {link.subLinks.map((subLink, subIndex) => (
