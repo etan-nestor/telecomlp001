@@ -1,7 +1,7 @@
 'use client'
 
 import { motion, AnimatePresence } from 'framer-motion'
-import { Phone, ShoppingCart, Wrench, ChevronDown, Menu, X } from 'lucide-react'
+import { Phone, ChevronDown, Menu, X } from 'lucide-react'
 import Link from 'next/link'
 import { useState, useEffect, useRef } from 'react'
 import { usePathname } from 'next/navigation'
@@ -59,8 +59,8 @@ export default function Navbar() {
       className={`fixed w-full z-50 ${scrolled ? 'bg-gray-900/90 backdrop-blur-md border-b border-gray-800' : 'bg-transparent'}`}
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-20">
-          {/* Logo */}
+        <div className="flex items-center justify-between h-16 md:h-20">
+          {/* Logo - Version mobile (icône seule) et desktop (icône + texte) */}
           <Link href="/" className="flex items-center space-x-2">
             <motion.div 
               whileHover={{ scale: 1.1 }}
@@ -73,7 +73,7 @@ export default function Navbar() {
               initial={{ opacity: 0, x: -20 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ delay: 0.2 }}
-              className="text-xl font-bold bg-gradient-to-r from-orange-400 to-red-500 bg-clip-text text-transparent"
+              className="hidden md:block text-xl font-bold bg-gradient-to-r from-orange-400 to-red-500 bg-clip-text text-transparent"
             >
               Nestor Telecom
             </motion.span>
@@ -161,15 +161,14 @@ export default function Navbar() {
           </div>
 
           {/* Mobile menu button */}
-          <div className="md:hidden flex items-center space-x-4">
+          <div className="md:hidden flex items-center space-x-3">
             <motion.div 
               whileHover={{ scale: 1.1 }}
               whileTap={{ scale: 0.9 }}
-              className="lg:hidden"
             >
               <Link 
                 href="/contact" 
-                className="px-3 py-1.5 rounded-md bg-gradient-to-r from-orange-500 to-red-600 text-white text-xs font-medium shadow-lg hover:from-orange-600 hover:to-red-700 transition-all"
+                className="px-3 py-1.5 text-xs rounded-md bg-gradient-to-r from-orange-500 to-red-600 text-white font-medium shadow-lg hover:from-orange-600 hover:to-red-700 transition-all"
               >
                 Devis
               </Link>
