@@ -3,7 +3,7 @@
 import { motion, AnimatePresence } from 'framer-motion'
 import { Phone, ShoppingCart, Wrench, ChevronDown, Menu, X } from 'lucide-react'
 import Link from 'next/link'
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { usePathname } from 'next/navigation'
 
 const navLinks = [
@@ -27,6 +27,7 @@ export default function Navbar() {
   const [hoveredLink, setHoveredLink] = useState<number | null>(null)
   const pathname = usePathname()
   const [scrolled, setScrolled] = useState(false)
+  const dropdownRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
     const handleScroll = () => {
@@ -34,6 +35,20 @@ export default function Navbar() {
     }
     window.addEventListener('scroll', handleScroll)
     return () => window.removeEventListener('scroll', handleScroll)
+  }, [])
+
+  // Fermer le dropdown si on clique à l'extérieur
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        setHoveredLink(null)
+      }
+    }
+
+    document.addEventListener('mousedown', handleClickOutside)
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside)
+    }
   }, [])
 
   return (
@@ -49,6 +64,7 @@ export default function Navbar() {
           <Link href="/" className="flex items-center space-x-2">
             <motion.div 
               whileHover={{ scale: 1.1 }}
+              whileTap={{ scale: 0.95 }}
               className="flex items-center justify-center w-10 h-10 rounded-full bg-gradient-to-br from-orange-500 to-red-600"
             >
               <Phone className="w-5 h-5 text-white" />
@@ -64,24 +80,29 @@ export default function Navbar() {
           </Link>
 
           {/* Desktop Navigation */}
-          <div className="hidden md:flex items-center space-x-8">
+          <div className="hidden md:flex items-center space-x-6 lg:space-x-8">
             {navLinks.map((link, index) => (
               <div 
                 key={index}
                 className="relative"
                 onMouseEnter={() => setHoveredLink(index)}
                 onMouseLeave={() => setHoveredLink(null)}
+                ref={dropdownRef}
               >
                 <Link 
                   href={link.href}
-                  className={`flex items-center px-1 py-2 text-sm font-medium transition-colors ${
+                  className={`flex items-center px-1 py-2 text-sm lg:text-[15px] font-medium transition-colors ${
                     pathname === link.href 
                       ? 'text-orange-400' 
                       : 'text-gray-300 hover:text-orange-400'
                   }`}
                 >
                   {link.name}
-                  {link.subLinks && <ChevronDown className="ml-1 w-4 h-4" />}
+                  {link.subLinks && (
+                    <ChevronDown className={`ml-1 w-4 h-4 transition-transform ${
+                      hoveredLink === index ? 'rotate-180' : ''
+                    }`} />
+                  )}
                 </Link>
 
                 {/* Active indicator */}
@@ -100,19 +121,20 @@ export default function Navbar() {
                       initial={{ opacity: 0, y: 10 }}
                       animate={{ opacity: 1, y: 0 }}
                       exit={{ opacity: 0, y: 10 }}
-                      transition={{ duration: 0.2 }}
-                      className="absolute left-0 top-full mt-2 w-48 rounded-md shadow-lg bg-gray-800 border border-gray-700 z-50"
+                      transition={{ duration: 0.2, ease: "easeOut" }}
+                      className="absolute left-0 top-full mt-1 w-56 rounded-md shadow-lg bg-gray-800 border border-gray-700 z-50 overflow-hidden"
                     >
                       <div className="py-1">
                         {link.subLinks.map((subLink, subIndex) => (
                           <Link
                             key={subIndex}
                             href={subLink.href}
-                            className={`block px-4 py-2 text-sm ${
+                            className={`block px-4 py-3 text-sm transition-colors ${
                               pathname === subLink.href
                                 ? 'bg-gray-700 text-orange-400'
                                 : 'text-gray-300 hover:bg-gray-700 hover:text-orange-400'
                             }`}
+                            onMouseEnter={() => setHoveredLink(index)}
                           >
                             {subLink.name}
                           </Link>
@@ -124,10 +146,14 @@ export default function Navbar() {
               </div>
             ))}
 
-            <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+            <motion.div 
+              whileHover={{ scale: 1.05 }} 
+              whileTap={{ scale: 0.95 }}
+              className="hidden lg:block"
+            >
               <Link 
                 href="/contact" 
-                className="px-4 py-2 rounded-md bg-gradient-to-r from-orange-500 to-red-600 text-white text-sm font-medium shadow-lg hover:from-orange-600 hover:to-red-700 transition-all"
+                className="px-4 py-2 rounded-md bg-gradient-to-r from-orange-500 to-red-600 text-white text-sm font-medium shadow-lg hover:from-orange-600 hover:to-red-700 transition-all duration-300"
               >
                 Demander un devis
               </Link>
@@ -135,7 +161,20 @@ export default function Navbar() {
           </div>
 
           {/* Mobile menu button */}
-          <div className="md:hidden flex items-center">
+          <div className="md:hidden flex items-center space-x-4">
+            <motion.div 
+              whileHover={{ scale: 1.1 }}
+              whileTap={{ scale: 0.9 }}
+              className="lg:hidden"
+            >
+              <Link 
+                href="/contact" 
+                className="px-3 py-1.5 rounded-md bg-gradient-to-r from-orange-500 to-red-600 text-white text-xs font-medium shadow-lg hover:from-orange-600 hover:to-red-700 transition-all"
+              >
+                Devis
+              </Link>
+            </motion.div>
+            
             <motion.button
               whileHover={{ scale: 1.1 }}
               whileTap={{ scale: 0.9 }}
@@ -160,55 +199,82 @@ export default function Navbar() {
             initial={{ opacity: 0, height: 0 }}
             animate={{ opacity: 1, height: 'auto' }}
             exit={{ opacity: 0, height: 0 }}
-            transition={{ duration: 0.3 }}
-            className="md:hidden bg-gray-900 border-t border-gray-800"
+            transition={{ duration: 0.3, ease: "easeInOut" }}
+            className="md:hidden bg-gray-900/95 backdrop-blur-sm border-t border-gray-800 overflow-hidden"
           >
             <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3">
               {navLinks.map((link, index) => (
-                <div key={index}>
-                  <Link
-                    href={link.href}
-                    className={`block px-3 py-2 rounded-md text-base font-medium ${
-                      pathname === link.href
-                        ? 'bg-gray-800 text-orange-400'
-                        : 'text-gray-300 hover:bg-gray-800 hover:text-white'
-                    }`}
-                    onClick={() => setIsOpen(false)}
+                <div key={index} className="overflow-hidden">
+                  <motion.div
+                    initial={{ x: -20, opacity: 0 }}
+                    animate={{ x: 0, opacity: 1 }}
+                    transition={{ delay: index * 0.05 + 0.1 }}
                   >
-                    {link.name}
-                  </Link>
+                    <Link
+                      href={link.href}
+                      className={`flex items-center justify-between px-3 py-3 rounded-md text-base font-medium ${
+                        pathname === link.href
+                          ? 'bg-gray-800 text-orange-400'
+                          : 'text-gray-300 hover:bg-gray-800 hover:text-white'
+                      }`}
+                      onClick={() => !link.subLinks && setIsOpen(false)}
+                    >
+                      {link.name}
+                      {link.subLinks && (
+                        <ChevronDown className={`w-4 h-4 transition-transform ${
+                          hoveredLink === index ? 'rotate-180' : ''
+                        }`} />
+                      )}
+                    </Link>
 
-                  {link.subLinks && (
-                    <div className="pl-4 mt-1 space-y-1">
-                      {link.subLinks.map((subLink, subIndex) => (
-                        <Link
-                          key={subIndex}
-                          href={subLink.href}
-                          className={`block px-3 py-2 rounded-md text-sm font-medium ${
-                            pathname === subLink.href
-                              ? 'bg-gray-700 text-orange-400'
-                              : 'text-gray-400 hover:bg-gray-700 hover:text-white'
-                          }`}
-                          onClick={() => setIsOpen(false)}
-                        >
-                          {subLink.name}
-                        </Link>
-                      ))}
-                    </div>
-                  )}
+                    {link.subLinks && (
+                      <motion.div
+                        initial={{ height: 0 }}
+                        animate={{ height: hoveredLink === index ? 'auto' : 0 }}
+                        className="pl-4 overflow-hidden"
+                      >
+                        <div className="space-y-1 py-1">
+                          {link.subLinks.map((subLink, subIndex) => (
+                            <motion.div
+                              key={subIndex}
+                              initial={{ opacity: 0, x: -10 }}
+                              animate={{ opacity: 1, x: 0 }}
+                              transition={{ delay: subIndex * 0.05 + 0.2 }}
+                            >
+                              <Link
+                                href={subLink.href}
+                                className={`block px-3 py-2.5 rounded-md text-sm font-medium ${
+                                  pathname === subLink.href
+                                    ? 'bg-gray-700 text-orange-400'
+                                    : 'text-gray-400 hover:bg-gray-700 hover:text-white'
+                                }`}
+                                onClick={() => setIsOpen(false)}
+                              >
+                                {subLink.name}
+                              </Link>
+                            </motion.div>
+                          ))}
+                        </div>
+                      </motion.div>
+                    )}
+                  </motion.div>
                 </div>
               ))}
             </div>
-            <div className="px-4 py-3 border-t border-gray-800">
-              <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
-                <Link
-                  href="/contact"
-                  className="w-full flex items-center justify-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-gradient-to-r from-orange-500 to-red-600 hover:from-orange-600 hover:to-red-700"
-                >
-                  Demander un devis
-                </Link>
-              </motion.div>
-            </div>
+            <motion.div 
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: navLinks.length * 0.05 + 0.1 }}
+              className="px-4 py-3 border-t border-gray-800"
+            >
+              <Link
+                href="/contact"
+                className="w-full flex items-center justify-center px-4 py-3 border border-transparent rounded-md shadow-sm text-base font-medium text-white bg-gradient-to-r from-orange-500 to-red-600 hover:from-orange-600 hover:to-red-700 transition-colors duration-300"
+                onClick={() => setIsOpen(false)}
+              >
+                Demander un devis
+              </Link>
+            </motion.div>
           </motion.div>
         )}
       </AnimatePresence>
